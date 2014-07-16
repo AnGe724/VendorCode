@@ -43,7 +43,7 @@
   <gap:plugin name="org.apache.cordova.camera" version="0.2.9"/>
 
   <gap:plugin name="org.apache.cordova.media-capture" />
-  <!--  FOLLOWING PLUGINS FAIL IOS BUILD
+  <!--  FOLLOWING PLUGINS FAIL IOS BUILD -->
   <gap:plugin name="org.apache.cordova.file-transfer" version="0.3.2" />
   <gap:plugin name="org.apache.cordova.file" version="1.0.1" />  
   <gap:plugin name="org.apache.cordova.camera" version="1.0.1" />
@@ -52,7 +52,7 @@
 
   <gap:plugin name="org.apache.cordova.media-capture" />
 
-  -->
+  <!-- -->
   
   <!-- Third party plugins -->
     <!-- A list of available plugins are available at https://build.phonegap.com/plugins -->
