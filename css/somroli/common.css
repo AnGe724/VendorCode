@@ -1,0 +1,280 @@
+.datelabel{
+  font-family: Verdana, Arial, sans-serif;
+  font-size:3em;
+}
+/*.label1{
+  font-family: Verdana, Arial, sans-serif;
+  font-size:2em;
+}*/
+.inputfield{
+  font-size:1em;
+}
+.selectdd{
+    font-size:1em;
+}
+.mybuttons a, .mybuttons button{
+    display:block;
+    float:left;
+    margin:0 4px 0 0;
+    background-color:#f5f5f5;
+    border:1px solid #cccccc;
+    border-top:1px solid #bbbbbb;
+    border-left:1px solid #bbbbbb;
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:150%;
+    line-height:100%;
+    text-decoration:none;
+    font-weight:bold;
+    color:#565656;
+    cursor:pointer;
+    padding:5px 10px 6px 7px; /* Links */
+    cursor:default;
+}
+.mybuttons a{
+    appearance: button;
+    -moz-appearance: button;
+    text-decoration: none; 
+    display: inline-block; 
+    padding: 5px 10px 4px 7px;
+    line-height:17px; /* Safari */
+}
+.mybuttons button{
+    width:auto;
+    overflow:visible;
+    padding:4px 10px 3px 7px; /* IE6 */
+}
+.mybuttons button[type]{
+    padding:5px 10px 5px 7px; /* Firefox */
+    line-height:17px; /* Safari */
+}
+*:first-child+html button[type]{
+    padding:4px 10px 3px 7px; /* IE7 */
+}
+.mybuttons button img, .mybuttons a img{
+    margin:0 3px -3px 0 !important;
+    padding:0;
+    border:none;
+    width:16px;
+    height:16px;
+    text-decoration:none;
+}
+/*standard*/
+button:hover, .mybuttons a:hover{
+    background-color:#dff4ff;
+    border:1px solid #cccccc;
+    color:#336699;
+    cursor:default;
+    text-decoration:none;
+}
+.mybuttons a:active{
+    background-color:#6299c5;
+    border:1px solid #cccccc;
+    cursor:default;
+    color:#fff;
+    text-decoration:none;
+}
+/*blue*/
+.mybuttons button.blue{
+    background-color:#3366cc;
+    border:1px solid #0040a4;
+    color:#fff;
+}
+.mybuttons a.blue{
+    background-color:#3366cc;
+    border:1px solid #0040a4;
+    color:#fff;
+}
+.mybuttons a.blue:hover, button.blue:hover{
+    background-color:#004bd2;
+    border:1px solid #0000a4;
+    color:#fff;
+}
+.mybuttons a.blue:active{
+    background-color:#004bd2;
+    border:1px solid #0000a4;
+    color:#fff;
+}
+/* white*/
+.mybuttons a.white, button.white{
+    background-color:#f0f0f0;
+    border:1px solid #c3c3c3;
+    color:#1e1e1e;
+}
+.mybuttons a.white:hover, button.white:hover{
+    background-color:#e1e1e1;
+    border:1px solid #b4b4b4;
+    color:#0f0f0f;
+}
+.mybuttons a.white:active{
+    background-color:#e1e1e1;
+    border:1px solid #b4b4b4;
+    color:#0f0f0f;
+}
+
+/* gray*/
+.mybuttons a.gray, button.gray{
+    background-color:#878787;
+    border:1px solid #777777;
+    color:#fff;
+}
+.mybuttons a.gray:hover, button.gray:hover{
+    background-color:#777777;
+    border:1px solid #5a5a5a;
+    color:#fff;
+}
+.mybuttons a.gray:active{
+    background-color:#dddddd;
+    border:1px solid #777777;
+    color:#fff;
+}
+/* orange*/
+.mybuttons a.orange, button.orange{
+    background-color:#d24100;
+    border:1px solid #c34b2f;
+    color:#fff;
+}
+.mybuttons a.orange:hover, button.orange:hover{
+    background-color:#ff4a00;
+    border:1px solid #d24100;
+    color:#fff;
+    text-decoration:none;
+}
+.mybuttons a.orange:active{
+    background-color:#ff4a00;
+    border:1px solid #d24100;
+    color:#fff;
+    text-decoration:none;
+}
+/* lightgreen*/
+.mybuttons a.lightgreen, button.lightgreen{
+    background-color:#b7f0b7;
+    border:1px solid #7aa47a;
+    color:#000;
+}
+.mybuttons a.lightgreen:hover, button.lightgreen:hover{
+    background-color:#a8d2a8;
+    border:1px solid #5c955c;
+    color:#000;
+    text-decoration:none;
+}
+.mybuttons a.lightgreen:active{
+    background-color:#a8d2a8;
+    border:1px solid #5c955c;
+    color:#000;
+    text-decoration:none;
+}
+/*time clock*/
+.punchbutton1{
+    display:block;
+    margin:0 4px 0 0;
+    background-color:#002a4a;
+    border:1px solid #0040a4;
+    border-top:1px solid #bbbbbb;
+    border-left:1px solid #bbbbbb;
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:2em;
+    line-height:100%;
+    text-decoration:none;
+    color:#fff;
+    cursor:pointer;
+    padding:5px 10px 6px 7px; /* Links */
+    cursor:default;
+    border-radius:5px;
+    
+}
+.punchbutton2{
+    display:block;
+    margin:0 4px 0 0;
+    background-color:#28682f;
+    border:1px solid #0040a4;
+    border-top:1px solid #bbbbbb;
+    border-left:1px solid #bbbbbb;
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:2em;
+    line-height:100%;
+    text-decoration:none;
+    color:#fff;
+    cursor:pointer;
+    padding:5px 10px 6px 7px; /* Links */
+    cursor:default;
+    border-radius:5px;
+}
+.deleteptobutton{
+    display:block;
+    margin:0 4px 0 0;
+    background-color:#ff4a00;
+    border:1px solid #0040a4;
+    border-top:1px solid #bbbbbb;
+    border-left:1px solid #bbbbbb;
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:1em;
+    line-height:100%;
+    text-decoration:none;
+    color:#fff;
+    cursor:pointer;
+    padding:5px; /* Links */
+    cursor:default;
+    text-align:center;
+}
+/*CLOCK.HTML*/
+.currentdate{
+    font-size:0.5em;
+}
+.currenttime{
+    font-size:1em;
+}
+.empname{
+    font-size:1.2em;
+    color:#a5a5a5;
+    padding:0.5em;
+    width:auto;
+}
+.sitename{
+    font-size:1.5em;
+    color:#009aa4;
+    padding:0.5em;
+    width:auto;
+}
+/*general*/
+.successmsg{
+    /*width:100%;*/
+    text-align:center;
+    font-size:1.2em;
+    color:#4da44d;
+    padding:0.5em;
+    background-color:#e4ffd5;   
+    width:auto;
+}
+.errormsg{
+    text-align:center;
+    font-size:1.2em;
+    color:#f0532f;
+    padding:0.5em;
+    background-color:#ffe3d5;    
+    width:auto;
+
+}
+/*pto*/
+.savedptodiv,tr.savedptodiv{
+    font-size:1.5em;
+    color:#007700;
+    text-align:center;
+}
+/*footer*/
+
+.copyright{
+    text-align:center;
+    font-size:0.5em;
+    color:#888888;
+    text-decoration: none;
+}
+.copyrighta{
+    text-decoration: none;
+    color:#888888;
+}
+.copyrightimg{
+ max-height:20px;
+}
+.appversion{
+    font-size:0.5em;
+}

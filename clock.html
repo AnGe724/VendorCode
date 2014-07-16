@@ -1,0 +1,311 @@
+<div id=debug class="col-xs-5"></div>
+
+<div id=clock_message align="center"></div>
+<div id="sitename" class="sitename" align="center"></div>
+
+<div class="panel-body panel-body-nopadding">
+<table border="0" class="table table-responsive" style="border:none">
+<tr>
+  <td colspan=2 align=center class="datelabel">
+  <h2>
+    <span class=currenttime id="currenttime" style="font-size:36px;"></span>
+    <span class=currentdate id="currentdate" style="font-size:18px;"></span>
+  </h2>
+
+  </td>
+</tr>
+
+<tr>
+  <td align=center>
+    <div class="empname" id="employee_name" align="center"></div>
+    <table id="table_emp_login" align=center>
+      <tr><td><span class="label1"><input class="input-sm" placeholder="ID" type=text name=empid id=empid /></span></td></tr>
+      <tr><td><span class="label1"><input class="input-sm" placeholder="Password"  type=password name=emppassword id=emppassword /></span></td></tr>
+    </table>
+  </td>
+  <td><img src="images/camera.png" style="max-height:100px;margin:auto;" id="myImage1"></td>
+</tr>
+
+
+<!--
+<tr id="tr_empid_input" align="center">
+  <td><span class="label1">
+    <input class="input-sm" placeholder="ID" type=text name=empid id=empid />
+  </span></td>
+  <td rowspan="2">
+  <img src="images/emp_img_placeholder.png" style="max-height:125px;margin:auto;" id="myImage1">
+  </td>
+</tr>
+<tr id="tr_emppassword_input"  align="center">
+  <td><span class="label1">
+    <input class="input-sm" placeholder="Password"  type=password name=emppassword id=emppassword />
+  </span></td>
+</tr>
+-->
+
+
+
+
+<tr>
+  <td colospan=2 align=center>
+      <div class="label1" id="workcodehtml"></div>
+  </td>
+</tr>
+  <td colspan=2 align=center style="padding:0px;"><div class="panel-footer">
+          <div class="row">
+            <div class="col-sm-6 col-sm-offset-3" align="center" style="padding:5px;">
+              <button class="btn btn-primary btn-lg" id="clock_in_button" style="margin-bottom:15px;">Clock <b><font size="+2">IN</font></b> &nbsp; &nbsp;</button>
+              &nbsp;
+              <button class="btn btn-primary btn-lg" id="clock_out_button" style="margin-bottom:15px;" >Clock <b><font size="+2">OUT</font></b></button>
+            </div>
+            <div class="col-sm-6 col-sm-offset-3" align="center" style="padding:5px;">
+              <button class="btn btn-success btn-lg" id="break_in_button" style="margin-bottom:15px;" >Break <b><font size="+2">IN</font></b> &nbsp; &nbsp;</button>
+              &nbsp;
+              <button class="btn btn-success btn-lg" id="break_out_button" style="margin-bottom:15px;" >Break <b><font size="+2">OUT</font></b></button>
+            </div>
+            <div class="col-sm-6 col-sm-offset-3" align="center" style="padding:5px;">
+             <a href="http://www.somroli.com/">&copy; Somroli</a>
+            </div>
+          </div>
+        </div></td>
+</table>
+
+
+        </div>
+
+<script>
+initiateGeoLoc();
+_xyz=setTimeout("initiateGeoLoc()",60000); /*refresh geo loc every 1 minute*/
+
+function initiateGeoLoc(){
+  if(ENABLE_GEOLOCATION_FOR_PUNCH){
+    GEO_LOC_FETCHING=true;
+    try{navigator.geolocation.getCurrentPosition(punch_onSuccess, punch_onError,{ enableHighAccuracy: true }); }catch(err){myalert(err.message);}
+  }
+}
+
+/*if !empty(PAID_BREAK_STATUS_CODE) show paid break button*/
+var g_status_code;
+var g_punch_datetime;
+$("#clock_in_button").click(function() {g_punch_datetime=getmysqlnow();initiatePunch(STATUS_CODE_CLOCKIN); });
+$("#clock_out_button").click(function(){g_punch_datetime=getmysqlnow();initiatePunch(STATUS_CODE_CLOCKOUT);});
+$("#break_in_button").click(function() {g_punch_datetime=getmysqlnow();initiatePunch(STATUS_CODE_BREAKIN);});
+$("#break_out_button").click(function(){g_punch_datetime=getmysqlnow();initiatePunch(STATUS_CODE_BREAKOUT);});
+$(timer());
+$(afterLoad());
+
+function initiatePunch(_status_code){
+  g_status_code=_status_code;
+  if(ENABLE_PUNCH_PHOTO){
+	  if(navigator.camera){
+		navigator.camera.getPicture(onURISuccess, onCameraError, { quality: 50, destinationType: Camera.DestinationType.FILE_URI,encodingType:Camera.EncodingType.JPEG });
+	  }
+      else submitpunch(g_status_code);
+  }
+  else{
+   submitpunch(g_status_code);
+  }
+}
+
+function submitpunch(status_code)
+{
+    pleasewait("clock_message");
+    //wait until geoloc is captured
+    //alert(GEO_LOC_FETCHING);
+    //if(GEO_LOC_FETCHING){setTimeout(function(){myalert("Hello");}, 3000);}
+
+	var _empID=(EMPLOYEE_ID=="")?$("#empid").val():EMPLOYEE_ID;
+	var _emppassword=(EMPLOYEE_PASSWORD=="")?$("#emppassword").val():EMPLOYEE_PASSWORD;
+	if(_empID=="" || _emppassword==""){
+	  $("#clock_message").html(messageHTML(CLOCK_MESSAGE_ENTER_ID_AND_PASSWORD,true));
+	  return false;
+	}
+
+	var json_data={};
+	json_data["methodname"]="postAttendance";
+	json_data["params"]=
+	{"EMPLOYEE_ID":_empID,
+	 "EMPLOYEE_PASSWORD":_emppassword,
+	 "ATT_SITE_ID":SEL_SITE_ID,
+	 "ATT_STATUS":status_code,
+	 "ATT_WORKCODE":$("#workcode").val(),
+	 "ATT_DATETIME":g_punch_datetime,
+	 "ATT_VERIFIED":ATT_VERIFIED,
+	 "LATITUDE":((LATITUDE == null || LATITUDE =="" )?-1:LATITUDE),
+	 "LONGITUDE":((LONGITUDE == null || LONGITUDE =="" )?-1:LONGITUDE),
+	 "ALTITUDE":((ALTITUDE == null || ALTITUDE =="" )?-1:ALTITUDE),
+	 "ACCURACY":((ACCURACY == null || ACCURACY =="" )?-1:ACCURACY),
+	 "ALTITUDEACCURACY":((ALTITUDEACCURACY == null || ALTITUDEACCURACY =="" )?-1:ALTITUDEACCURACY),
+	 "HEADING":((HEADING == null || HEADING =="" )?-1:HEADING),
+	 "SPEED":((SPEED == null || SPEED =="" )?-1:SPEED),
+	 };
+	myalert(JSON.stringify(json_data));
+
+	if(DEBUG_MODE){myalert(JSON_PATH);$("#debug").html(JSON.stringify(json_data));}
+	$.ajax({
+	  url: JSON_PATH,
+	  type: "POST",
+	  dataType: "json", /*type of data expected from server*/
+	  data: JSON.stringify(json_data),
+	  beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(CUSTOMER_CODE + ":" + CUSTOMER_KEY)); },
+	  success:clock_success,
+	  complete: clock_complete,
+	  contentType: "application/json; charset=\"utf-8\"",
+	  error: clock_error
+	});
+
+	return false;
+}
+function clock_error(xhr,textStatus,err){
+  if(DEBUG_MODE){
+    $("#debug").html(
+    $("#debug").html()+
+    ("readyState: " + xhr.readyState)+
+    ("responseText: "+ xhr.responseText)+
+    ("status: " + xhr.status)+
+    ("text status: " + textStatus)+
+    ("error: " + err)+
+    ("data: " +  $.http)
+    )
+    ;
+    }
+}
+
+function clock_success(result,status,xhr){
+ //alert(xhr.responseText);
+ $("#clock_message").html(messageHTML(result["MESSAGE"],result["ERROR"]));
+}
+function clock_complete(XMLHTTPRequest, status)
+{
+ //post processing stuff
+}
+function timer(){
+    var time = new Date();
+    var hours = time.getHours();
+    var minutes = time.getMinutes();
+    var ampm="AM";
+    var weekday=new Array("Sun","Mon","Tues", "Wed", "Thu", "Fri", "Sat");
+    /*var monthName = [ "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December" ];*/
+    if(hours >12){hours=hours-12;ampm="PM";}
+    minutes=((minutes < 10) ? "0" : "") + minutes;
+    var seconds = time.getSeconds();
+    seconds=((seconds < 10) ? "0" : "") + seconds;
+    var clock = ""+hours + ":" + minutes + " <font size=\"-0.1\">" + seconds+"</font>" ;
+    //_date=(time.getMonth()+1)+"-"+time.getDate()+"-"+time.getFullYear();
+    _date=weekday[time.getDay()]+","+" "+MONTHNAMES[time.getMonth()]+" "+time.getDate();
+    $("#currenttime").html(clock);
+    $("#currentdate").html(_date);
+
+    _timer = setTimeout("timer()",1000);
+}
+
+function afterLoad(){
+  /*add language specific label texts*/
+
+  //show emp name/site name etc
+  if(EMPLOYEE_ID != null && EMPLOYEE_ID !=""){
+
+    $("#table_emp_login").hide();
+    //$("#tr_empid_input").hide();
+    //$("#tr_emppassword_input").hide();
+    $("#employee_name").html(HELLO +" "+EMPLOYEE_FIRST_NAME+" "+EMPLOYEE_LAST_NAME+"!");
+  }
+  //load site name
+  if(SEL_SITE_ID !=""){
+      $("#sitename").html(SITE_LIST[SEL_SITE_ID]);
+  }
+  else{
+      $("#sitename").html(MESSAGE_NO_SITE);
+  	  $("#clock_message").html(messageHTML(ERROR_NO_SITE,true));
+}
+  //work codes if there is any
+  if(WORK_CODES !=null){
+	   var _option="<option value=''></option>";
+	   $.each( WORK_CODES, function( key, value ) {
+		 _option += "<option value='"+key + "' "+((EMP_DEFAULT_WORKCODE==key)?"selected":"")+">" + value + "</option>";
+	   });
+	   var _html="<select class='selectdd input-sm input-lg' name='workcode' id='workcode'>"+_option+"</select></div>";
+	   $("#workcodehtml").html(_html);
+  }
+  else $("#workcodehtml").html("<input type=hidden name=workcode id=workcode value=''>");
+  //myalert(window.localStorage.getItem('settings'));
+}
+/*GEO LOCATION*/
+function punch_onSuccess(position) {
+        //myalert('success geo location');
+        LATITUDE			=position.coords.latitude;
+		LONGITUDE			=position.coords.longitude;
+		ALTITUDE			=position.coords.altitude;
+		ACCURACY			=position.coords.accuracy;
+		ALTITUDEACCURACY	=position.coords.altitudeAccuracy;
+		HEADING				=position.coords.heading ;
+		SPEED				=position.coords.speed   ;
+		GEO_LOC_FETCHING=false;
+}
+// Show an alert if there is a problem getting the geolocation
+function punch_onError(error){myalert('code: '    + error.code    + '\n' +
+            'message: ' + error.message + '\n');
+             GEO_LOC_FETCHING=false;
+
+}
+/*------------------------ Camera script Begins  -------------------------*/
+  function onURISuccess(imageURI) {
+     document.getElementById('myImage1').src = imageURI;
+     submitpunch(g_status_code);
+     upload_punchphoto(imageURI);
+  }
+  //onError: Failed to get picture
+  function onCameraError(message) {
+        submitpunch(g_status_code);
+        myalert('Failed because: ' + message)
+  }
+  function upload_punchphoto(imageURI){
+		try{
+			myalert("imageURI: " + imageURI);
+			//document.getElementById("myimg").src = imageURI;
+			//try{
+			var options = new FileUploadOptions();
+			//}catch(err) {myalert("Oops Error:"+err.message );}
+			options.chunkedMode = false;
+			options.fileKey = "punchPhotoFile";
+			//options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
+			/*custid_emp_id_mysqldatetime*/
+			var _empid=(EMPLOYEE_ID=="")?$("#empid").val():EMPLOYEE_ID;
+			options.fileName = CUSTOMER_CODE+"_"+_empid+"_"+(g_punch_datetime.replace(" ","_").replace(":","_"))+".jpg";
+			options.mimeType = "image/jpeg";
+			var ft = new FileTransfer();
+			//myalert("before"+PHOTOPUNCH_SERVER_FILE_PATH);
+			ft.upload(imageURI, PHOTOPUNCH_SERVER_FILE_PATH, win, fail, options);
+	    }
+	    catch(err) {
+		  myalert("Oops Error:"+err.message );
+	    }
+
+
+  }
+  function win(r){myalert("Sent = " + r.bytesSent);}
+  function fail(error)
+  { switch (error.code){
+     case FileTransferError.FILE_NOT_FOUND_ERR:
+      myalert("Photo file not found");
+      break;
+     case FileTransferError.INVALID_URL_ERR:
+      myalert("Bad Photo URL");
+      break;
+     case FileTransferError.CONNECTION_ERR:
+      myalert("Connection error");
+      break;
+    }
+    myalert("An error has occurred: Code = " + error.code);
+  }
+// function onDataSuccess(imageData) {
+    // alert('photo data success')
+    // document.getElementById('myImage2').src =  "data:image/jpeg;base64," + imageData;
+    // var image = document.getElementById('myImage1');
+    //image.src = imageURI;
+//}
+/*---------------------------------------- Camera Script Ends ----------------------------------*/
+
+
+</script>

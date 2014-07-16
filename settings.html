@@ -1,0 +1,179 @@
+
+<section>
+
+  <!-- leftpanel -->
+
+
+  <!-- headerbar -->
+  <div id=debug align="center"></div>
+  <div id=settings_message align="center"></div>
+  <table width="100%" border="0" class=" table table-responsive">
+
+    <tr>
+      <td  align="center">Server</td>
+      <td  align="center"><input type="text" placeholder="Server" class="input-sm"  name="server" id="server" /></td>
+    </tr>
+    <tr>
+      <td  align="center">Account Code</td>
+      <td  align="center"><input type="text" placeholder="Account Code" class="input-sm" name="account_code" id="account_code" /></td>
+    </tr>
+    <tr>
+      <td  align="center">Account Key</td>
+      <td  align="center"><input type="text" placeholder="Account Key" class="input-sm" name="account_key" id="account_key" /></td>
+    </tr>
+    <tr>
+      <td  align="center">ID</td>
+      <td  align="center"><input type="text" placeholder="id" class="input-sm"  name="setting_empid" id="setting_empid"/></td>
+    </tr>
+    <tr>
+      <td  align="center">Password</td>
+      <td  align="center"><input type="password" placeholder="password" class="input-sm" name="setting_emppassword" id="setting_emppassword"/></td>
+    </tr>
+    <tr>
+      <td colspan=2  align="center"><div id="savesitehtml"></div></td>
+        </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><button class="btn btn-success btn-lg" id="configure">Register</button></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><button class="btn btn-primary btn-lg"  id="reset">Reset</button></td>
+    </tr>
+
+    <tr>
+      <td colspan="2" align="center">
+        <a href="http://www.somroli.com/">&copy; Somroli</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan=2 align=right style="color:#ccc;"><div id="readfromdb" style="visibility:none;">Sys</div>
+        <div id="debug_switch">Dev</div>
+        <span id="devvalue"></span></td>
+        </td>
+    </tr>
+  </table>
+</section>
+<script>
+$(fillform_settings());
+$("#reset").click(function() {
+      if($("#account_key").val() != CUSTOMER_KEY){
+        $("#settings_message").html(messageHTML(SETTINGS_RESET_NOT_AUTHORIZED,true));
+      }
+      else{
+        removeLocalStorageItem("settings");
+        $("#settings_message").html(messageHTML(SETTINGS_RESET,false));
+      }
+      load_settings();
+      $("#savesitehtml").html("");
+
+});
+$("#debug_switch").click(function() {
+   _debug=window.localStorage.getItem('DEBUG_SWITCH');
+   /*Toggle debug*/
+   if(_debug=='1'){window.localStorage.setItem('DEBUG_SWITCH','0');DEBUG_MODE=false;}
+   else {window.localStorage.setItem('DEBUG_SWITCH','1');DEBUG_MODE=true;}
+   //alert(window.localStorage.getItem('DEBUG_SWITCH'));
+   $("#devvalue").html(window.localStorage.getItem('DEBUG_SWITCH'));
+
+});
+$("#devvalue").html(window.localStorage.getItem('DEBUG_SWITCH'));
+
+
+if(SITE_LIST != null && SITE_LIST != ""){
+ savesite("show");
+}
+$("#configure").click(function() {
+    pleasewait("settings_message");
+    //check with server if credentials ok
+	JSON_PATH="http://"+$("#server").val()+"/mobileserver1/somroliMobileJSONServer.php";
+	if(DEBUG_MODE){alert(JSON_PATH);$("#debug").html(JSON.stringify({"methodname":"verifyaccount"}));}
+	$.ajax({
+	  url: JSON_PATH,
+	  type: "POST",
+	  dataType: "json", /*type of data expected from server*/
+	  data: JSON.stringify({"methodname":"verifyaccount","EMPLOYEE_ID":$("#setting_empid").val(),"EMPLOYEE_PASSWORD":$("#setting_emppassword").val()}),
+	  beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa($("#account_code").val() + ":" + $("#account_key").val())); },
+	  success:verification_success,
+	  complete: verification_complete,
+	  contentType: "application/json; charset=\"utf-8\"",
+	  error: verification_error
+	});
+
+   return false;
+});
+function fillform_settings(){
+ if(SERVER==""){
+  $("#settings_message").html(messageHTML(SETTINGS_NOT_FOUND,true));
+  return false;
+ }
+ else if(CUSTOMER_CODE =="" || CUSTOMER_KEY ==""){
+  $("#settings_message").html(messageHTML(SETTINGS_NOT_FOUND,true));
+  return false;
+ }
+ else{
+   //fillform settings on the form
+   $("#settings_message").html(messageHTML(SETTINGS_FOUND,false));
+   $("#server").val(SERVER);
+   $("#account_code").val(CUSTOMER_CODE);
+   {if(CUSTOMER_KEY)$("#account_key").val(CUSTOMER_KEY.replace(/[a-zA-Z0-9]/g, '*'));}
+   $("#setting_empid").val(EMPLOYEE_ID);
+   if(EMPLOYEE_PASSWORD !=""){$("#setting_emppassword").val(EMPLOYEE_PASSWORD.replace(/[a-zA-Z0-9]/g, '*'));}
+ }
+ if(CUSTOMER_CODE=='1'){
+   $("#readfromdb").css("visibility","show");
+   $("#readfromdb").click(function() {myalert(window.localStorage.getItem('settings'));});
+ }
+
+}
+function verification_complete(XMLHTTPRequest, status){}
+function verification_success(result,status,xhr){
+  //alert(xhr.responseText);
+  if(result["ERROR"]==0){
+    var data= result["DATA"];
+    myalert(JSON.stringify(data));
+    //if ok save it in local database
+    window.localStorage.setItem('settings', JSON.stringify(data));
+    load_settings(); //get all settings in settings.js
+    $("#account_key").val(CUSTOMER_KEY.replace(/[a-zA-Z0-9]/g, '*'));
+    savesite("show");
+  }
+  $("#settings_message").html(messageHTML(result["MESSAGE"],result["ERROR"]));
+}
+
+function verification_error(xhr,textStatus,err){
+  if(DEBUG_MODE){
+    $("#debug").html(
+    $("#debug").html()+
+    ("readyState: " + xhr.readyState)+
+    ("responseText: "+ xhr.responseText)+
+    ("status: " + xhr.status)+
+    ("text status: " + textStatus)+
+    ("error: " + err)+
+    ("data: " +  $.http)
+    )
+    ;
+  }
+  $("#settings_message").html(messageHTML(ACCOUNT_CAN_NOTBE_VERIFIED,true));
+  return false;
+}
+function savesite(type){
+  if(type=="show"){
+   //myalert(JSON.stringify(SITE_LIST));
+   var _option="<option value=''>" + SEL_SITE + "</option>";
+   $.each( SITE_LIST, function( key, value ) {
+     _option += "<option value='"+key + "' "+((SEL_SITE_ID==key)?"selected":"")+">" + value + "</option>";
+   });
+   var _html="<div class='label1'><select class='selectdd input-sm input-lg' onChange='savesite(\"save\");' name='savesite' id='savesite'>"+_option+"</select></div>";
+   $("#savesitehtml").html(_html);
+  }
+  else if(type=="save"){
+     //save in localstorage settings
+     if($("#savesite").val() !=""){
+        SEL_SITE_ID=$("#savesite").val();
+        updateSetting("SEL_SITE_ID",SEL_SITE_ID);
+        $("#settings_message").html(messageHTML(DEFAULT_SITE_SAVED,false));
+     }
+  }
+}
+</script>

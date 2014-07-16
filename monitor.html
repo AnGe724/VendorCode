@@ -1,0 +1,144 @@
+<link rel="stylesheet" href="css/monitor.css">
+<table align=center cellspacing=10 cellpadding=5 class=" table table-responsive">
+<tr>
+  <td colspan=2 align=center><div id=debug></div></td>
+</tr>
+<tr>
+<tr>
+  <td colspan=2 align=center><div id=monitor_message></div></td>
+</tr>
+<tr>
+  <td align=center><div id="site_filter_html" style="float:left;"></div><div id="now_status_html"  style="float:right;"></div></td>
+<tr>
+<tr>
+  <td>
+    <div style="-webkit-overflow-scrolling: touch;" id="monitor_data"></div>
+    <div style="text-align:center;margin-top:1em;"><img id="down_arrow" src="images/down-arrow-small.png"></div>
+  </td>
+</tr>
+    <tr>
+      <td align="center">
+        <a href="http://www.somroli.com/">&copy; Somroli</a>
+      </td>
+    </tr>
+
+</table>
+
+<script>
+var _curpage=0;
+$("#down_arrow").click(function() {_curpage=_curpage+1;refreshmonitor(_curpage); });
+$(afterLoad());
+function refreshmonitor(_page)
+{
+    if(_page==0){$('#monitor_data').html(""); }
+
+	var _empID=(EMPLOYEE_ID=="")?$("#empid").val():EMPLOYEE_ID;
+	var _emppassword=(EMPLOYEE_PASSWORD=="")?$("#emppassword").val():EMPLOYEE_PASSWORD;
+	var json_data={};
+	json_data["methodname"]="monitor";
+	json_data["params"]=
+	{"EMPLOYEE_ID":_empID, "EMPLOYEE_PASSWORD":_emppassword,
+	 "SITE_ID":$("#site_filter").val(),
+	 "NOW_STATUS":$("#now_status").val(),
+	 "page":_page
+	 };
+	myalert(JSON.stringify(json_data));
+
+	if(DEBUG_MODE){myalert(JSON_PATH);$("#debug").html(JSON.stringify(json_data));}
+	$.ajax({
+	  url: JSON_PATH,
+	  type: "POST",
+	  dataType: "json", /*type of data expected from server*/
+	  data: JSON.stringify(json_data),
+	  beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(CUSTOMER_CODE + ":" + CUSTOMER_KEY)); },
+	  success:monitor_success,
+	  complete: monitor_complete,
+	  contentType: "application/json; charset=\"utf-8\"",
+	  error: monitor_error
+	});
+
+	return false;
+}
+function monitor_error(xhr,textStatus,err){
+  if(DEBUG_MODE){
+    $("#debug").html(
+    $("#debug").html()+
+    ("readyState: " + xhr.readyState)+
+    ("responseText: "+ xhr.responseText)+
+    ("status: " + xhr.status)+
+    ("text status: " + textStatus)+
+    ("error: " + err)+
+    ("data: " +  $.http)
+    )
+    ;
+    }
+}
+
+function monitor_success(result,status,xhr){
+ //alert(xhr.responseText);
+  if(result["ERROR"]==0){
+    displaydata(result);
+ }
+ else{
+   $("#monitor_message").html(messageHTML(result["MESSAGE"],result["ERROR"]));
+ }
+}
+var _mdate="";
+function displaydata(result){
+  //if(DEBUG_MODE){myalert(JSON_PATH);$("#debug").append(JSON.stringify(result));}
+  //result : array of attendance record, info etc
+  var _records=result["DATA"];
+  //monitor_data
+   _newhtml="<table border=0 cellspacing=0 width=100% class=table table-responsive>";
+   var inout='';
+   var empimg="";
+   $.each( _records, function( key, _rec ) {
+      /*add date row*/
+      if(_mdate !=_rec["DISPLAY_DATE"]){
+        _newhtml=_newhtml+'<tr class=mdate><td colspan=4 align=left>&nbsp;'+_rec["DISPLAY_DATE"]+'</td><td></tr>';
+        _mdate=_rec["DISPLAY_DATE"];
+      }
+      if(_rec["CLOCK_START"] ==null){inout="&nbsp;";}
+      else{inout='<span class=intime>'+_rec["CLOCK_START"]+'</span>';}
+      inout +="-";
+      if(_rec["CLOCK_END"] ==null){inout +="&nbsp;";}
+      else{inout +='<span class=outtime>'+_rec["CLOCK_END"]+'</span>';}
+      if(_rec["TIME_WORKED"] !=null){inout +='&nbsp;<span class=timeworked>'+_rec["TIME_WORKED"]+'</span>';}
+
+
+      empimg=(_rec["EMP_IMAGE"]==null)?("<img class=monitorempimage src=\"images/emp-noimage.png\">"):("<img class=monitorempimage src=\""+_rec["EMP_IMAGE"]+"\">");
+     _newhtml=_newhtml+'<tr><td align=left>'+empimg+'</td><td class=mempname>'+_rec["EMP_NAME"]+'</td><td>'+inout+'</td></tr>';
+     //myalert(_rechtml);
+   });
+  _newhtml=_newhtml+'</table>';
+  $('#monitor_data').append(_newhtml);
+}
+function monitor_complete(XMLHTTPRequest, status){}
+
+function afterLoad(){
+  /*add language specific label texts*/
+
+  //show emp name/site name etc
+  //<div id="site_filter" class="sitename"></div><div id="now_status" class="sitename">
+
+  //load selected site
+  //display SITE_LIST drop down
+   var _option="<option value=''>" + SEL_SITE + "</option>";
+   $.each( SITE_LIST, function( key, value ) {
+     _option += "<option value='"+key + "' "+((SEL_SITE_ID==key)?"selected":"")+">" + value + "</option>";
+   });
+   var _html="<div style='float:left;margin-left:1em;'  class='msitedd'><select class='selectdd form-control input-sm  input-lg' onChange='refreshmonitor(0);' name='site_filter' id='site_filter'>"+_option+"</select></div>";
+   $("#site_filter_html").html(_html);
+
+   //load now_status option
+   $("#now_status_html").html("<div style='float:left;margin-left:1em;'  class='mtypedd'><select class='selectdd form-control input-sm input-lg' onChange='refreshmonitor(0);' name='now_status' id='now_status' data-role='slider'><option value='all'>"+MONITOR_ALL+"</option><option value='workingnow'>"+MONITOR_WORKING_NOW+"</option></select></div>");
+
+
+   //load data
+   refreshmonitor(0);
+
+
+
+  //myalert(window.localStorage.getItem('settings'));
+}
+</script>

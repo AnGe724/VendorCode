@@ -1,0 +1,53 @@
+<div class="headerbar">
+<div class="btn-group">
+            <img data-toggle="dropdown" src="images/menu-sm.png" style=class="img-responsive" border=0>
+            <div class="dropdown-menu dropdown-menu-head pull-left">
+ <ul class="nav nav-list">
+
+ <h5 class="alert  badge-info">  <li onClick="loadMenuOption(this);" id=menu_clock><i class="fa fa-clock-o"></i> <span>Clock</span></li> </h5>
+
+ <h5 class="alert badge-info">  <li onClick="loadMenuOption(this);" id=menu_pto><i class="fa  fa-umbrella"></i> <span>PTO</span></li> </h5>
+
+ <h5 class="alert badge-info">  <li onClick="loadMenuOption(this);" id=menu_monitor><i class="fa fa-check"></i> <span>Monitor</span></li> </h5>
+
+ <h5 class="alert badge-info">  <li onClick="loadMenuOption(this);" id=menu_settings><i class="fa fa-cog"></i> <span>Settings</span></li> </h5>
+
+ <h5 class="alert badge-info">  <li onClick="loadMenuOption(this);" id=menu_about><i class="fa fa-shield"></i> <span>About</span></li> </h5>
+
+		</ul>
+
+             </div>
+          </div>
+ <!--<div class="header-right">
+      <ul class="headermenu">
+        <li>
+          <div class="btn-group"> </div>
+        </li>
+        <li>
+          <div class="btn-group">
+            <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown"> Menu </button>
+            <div class="dropdown-menu dropdown-menu-head pull-right">
+ <h5 class="alert-info"> <li onClick="loadMenuOption(this);" id=menu_clock><i class="fa fa-clock-o"></i> <span>Clock</span></li></h5>
+<h5 class="alert-info"><li onClick="loadMenuOption(this);" id=menu_pto><i class="fa  fa-umbrella"></i> <span>PTO</span></li></h5>
+<h5 class="alert-info"> <li onClick="loadMenuOption(this);" id=menu_monitor><i class="fa fa-check"></i> <span>Monitor</span></li></h5>
+<h5 class="alert-info"><li onClick="loadMenuOption(this);" id=menu_settings><i class="fa fa-shield"></i> <span>Settings</span></li></h5>
+             </div>
+          </div>
+        </li>
+      </ul>
+    </div>-->
+    <!-- header-right-->
+
+  </div>
+
+
+	<script>
+$(afterLoad());
+function afterLoad(){
+  /*Hide menu options which are disabled or employe not eligible*/
+  if(!CLOCK_TOOL){$("#menu_clock").hide();}
+  if(!EXTRAPAY_TOOL){$("#menu_extrapay").hide();}
+  if(!PTO_REQUEST){$("#menu_pto").hide();}
+  if(!MONITOR){$("#menu_monitor").hide();}
+}
+</script>

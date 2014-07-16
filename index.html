@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="shortcut icon" href="images/favicon.png" type="image/png">
+<title>Somroli</title>
+<link rel="stylesheet" href="css/somroli/common.css" />
+<link rel="stylesheet" href="css/style.default.css" />
+<script src="phonegap.js"></script>
+<script src="lib/jquery-2.1.0.js"></script>
+<!--GTW added ref http://demos.jquerymobile.com/1.4.2/-->
+<!--<script src="lib/jquery.mobile-1.4.2.js"></script>-->
+
+<script src="js/storage/memory-store.js"></script>
+<script src="js/somroli/somroli-ajax.js"></script>
+<script src="js/somroli/somrolidate.js"></script>
+<!--app specific js-->
+<script src="js/somroli/util.js"></script>
+<script src="js/somroli/settings.js"></script>
+<script src="js/somroli/localization.js"></script>
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="js/html5shiv.js"></script>
+  <script src="js/respond.min.js"></script>
+  <![endif]-->
+
+
+</head>
+
+<body>
+<style>
+.alert {
+margin-bottom:0px;
+}
+.styles
+{
+ font-weight:bold;
+ font-size:14px;
+ background-color:#009aa4;
+ color:#FFF;
+}
+.styles1
+{
+ font-weight:bold;
+ font-size:14px;
+ background-color:#FF0000;
+ color:#FFF;
+}
+.table thead > tr > th, .table tbody > tr > th, .table tfoot > tr > th, .table thead > tr > td, .table tbody > tr > td, .table tfoot > tr > td
+{
+	border:none;
+}
+
+.panel-heading, .panel-footer
+{
+	border:none;
+}
+</style>
+
+<!-- Preloader -->
+<div id="preloader">
+  <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
+</div>
+<section>
+<div class="leftpanel">
+
+  </div>
+  <div class="headerbar" id="menu">
+
+  </div>
+  <!-- leftpanel -->
+
+  <div class="mainpanel" id="bodyContent">
+   Main menu
+  </div>
+  <!-- mainpanel -->
+
+
+  <!-- rightpanel -->
+
+</section>
+
+
+<script>
+$(function(){
+      load_settings();
+      $("#bodyContent").load("clock.html");
+      $("#menu").load("menu.html");
+      $.support.cors=true;
+      document.addEventListener("deviceready", onDeviceReady, false);
+    });
+function onDeviceReady() {
+	document.addEventListener("offline", onOffline, false);
+    //geo location
+    //REBOOT THE DEVICE HELPED FIX
+    //var options = { enableHighAccuracy: true }; // also try with false.
+    //navigator.geolocation.getCurrentPosition(onSuccess, onError,options);
+    //$("#appversion").html('Version:'+device.version);
+}
+function onOffline() {
+}
+
+function loadMenuOption(ele){
+  id=ele.id;
+  $(".menuactive").toggleClass("menuactive menuinactive");
+  $("#"+id).toggleClass("menuinactive menuactive");
+  if(id=="menu_clock"){$("#bodyContent").load("clock.html");}
+  else if(id=="menu_extrapay"){$("#bodyContent").load("extrapay.html");}
+  else if(id=="menu_pto"){$("#bodyContent").load("pto.html");}
+  //else if(id=="menu_timecard"){$("#bodyContent").load("timecard.html");}
+  //else if(id=="menu_approval"){$("#bodyContent").load("approval.html");}
+  else if(id=="menu_monitor"){$("#bodyContent").load("monitor.html");}
+  else if(id=="menu_settings"){$("#bodyContent").load("settings.html");}
+  else if(id=="menu_about"){$("#bodyContent").load("about.html");}
+
+
+}
+
+
+</script>
+
+
+
+
+<script src="js/jquery-1.10.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/retina.min.js"></script>
+<script src="js/custom.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

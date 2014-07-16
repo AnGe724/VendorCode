@@ -1,0 +1,232 @@
+<div id=pto_message></div>
+<div class="empname" id="employee_name" align="center"></div>
+<table width="100%" border="0" class=" table table-responsive">
+  <tr id="tr_emp_login_id" >
+    <td align="center">ID</td>
+    <td align="center"><input type=text name=empid id=empid placeholder="id" class="input-sm" /></td>
+  </tr>
+  <tr  id="tr_emp_login_pass" >
+    <td align="center">Password</td>
+    <td align="center"><input type=password name=emppassword id=emppassword placeholder="Default Input" class="input-sm" /></td>
+  </tr>
+  <tr>
+    <td align="center">Type</td>
+    <td align="center"><div class="label1" id="ptohtml">
+      </div></td>
+  </tr>
+  <tr>
+    <td align="center">Date</td>
+    <td align="center">
+
+    <div class="label1" style='float:left;'><select class="selectdd input-sm input-lg" name=ptomonth id=ptomonth></select></div>
+    <div class="label1" style='float:left;margin-left:5px;'><select class="selectdd input-sm input-lg" name=ptodate id=ptodate></select></div>
+    <div class="label1" style='float:left;margin-left:5px;'><select class="selectdd input-sm input-lg" name=ptoyear id=ptoyear></select></div>
+
+
+   </td>
+  </tr>
+  <tr>
+    <td align="center">Hours</td>
+    <td align="center"><input min="1" max="24" type="number" class="input-sm" name=ptohours id=ptohours /></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><button class="btn btn-success btn-lg" id="savepto">SAVE</button></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <div class="" id="saved_pto_html"></div>
+    </td>
+  </tr>
+  <tr>
+  <td colspan=2 align=center>
+  <textarea rows="2" cols=50 placeholder="comments" name=comments id=comments>
+  </textarea>
+<tr>
+  <tr>
+    <td colspan="2" align="center"><button class="btn btn-primary btn-lg" id="submit">Submit</button></td>
+  </tr>
+
+  <tr>
+    <td colspan="2" align="center">
+     <a href="http://www.somroli.com/">&copy; Somroli</a>
+    </td>
+  </tr>
+</table>
+
+<script>
+$("#submit").click(function() {submitpto(); });
+$("#savepto").click(function() {savepto(); });
+$(afterLoad());
+function savepto(){
+  if(isNaN($("#ptohours").val()) || $("#ptohours").val() > 24){
+   $("#pto_message").html(messageHTML(PLEASE_ENTER_NUMBER_HOURS,1));
+   return false;
+  }
+  //save in localstorage
+   _saved_pto =getLocalStorage('saved_pto');
+   if(_saved_pto == null){
+     _saved_pto=new Array();
+   }
+   //alert(JSON.stringify(_saved_pto));
+   var _empID=(EMPLOYEE_ID=="")?$("#empid").val():EMPLOYEE_ID;
+   var _emppassword=(EMPLOYEE_PASSWORD=="")?$("#emppassword").val():EMPLOYEE_PASSWORD;
+   var _newline_pto=	{"EMPLOYEE_ID":_empID, "EMPLOYEE_PASSWORD":_emppassword,
+	 "PTO_CODE":$("#ptocode").val(),
+	 "PTO_DATETIME":$("#ptoyear").val()+"-"+$("#ptomonth").val()+"-"+$("#ptodate").val(),
+	 "PTO_HOURS":$("#ptohours").val(),
+	 "pqr":""
+	 };
+	 //alert(_newline_pto);
+  _saved_pto[_saved_pto.length]=_newline_pto;
+  myalert(JSON.stringify(_saved_pto));
+  saveLocalStorage('saved_pto',_saved_pto);
+  //remove hour entry
+  $("#ptohours").val("");
+  //display appended list
+  displaySavedPTO();
+}
+function deletepto(_id){
+  //upate in localstorage
+   var _saved_pto =getLocalStorage('saved_pto');
+   _saved_pto.splice(_id,1);
+  saveLocalStorage('saved_pto',_saved_pto);
+  //update appended list
+  displaySavedPTO();
+}
+function displaySavedPTO(){
+   //read from localstorage and display
+   var _empID=(EMPLOYEE_ID=="")?$("#empid").val():EMPLOYEE_ID;
+   var _emppassword=(EMPLOYEE_PASSWORD=="")?$("#emppassword").val():EMPLOYEE_PASSWORD;
+   var _saved_pto =getLocalStorage('saved_pto');
+   var _html="";
+   if(_saved_pto != null){
+	   $.each( _saved_pto, function( key, rec ) {
+	     //some other emp logged in, clear memory
+		 if(rec["EMPLOYEE_ID"] !=_empID){
+  			removeLocalStorageItem('saved_pto');
+  			return false;
+		 }
+         /*_html +="<div style='float:left;'>"+getMysqlToDisplayFromat(rec["PTO_DATETIME"],"")+"&nbsp;</div><div style='float:left;'>"+PTO_CODES[rec["PTO_CODE"]]+"&nbsp;</div><div style='float:left;'>"+rec["PTO_HOURS"]+"</div>"+"&nbsp;<div class='deleteptobutton' onClick=deletepto("+key+"); del_id='"+key+"' style='float:left;'>X</div><div style='clear:both;'>";
+         */
+		  _html +="<tr class='savedptodiv'><td>"+getMysqlToDisplayFromat(rec["PTO_DATETIME"],"")+"&nbsp;</td><td>"+PTO_CODES[rec["PTO_CODE"]]+"&nbsp;</td><td>"+rec["PTO_HOURS"]+"</td>"+"&nbsp;<td ><div class='deleteptobutton' onClick=deletepto("+key+"); del_id='"+key+"'>X</div></td><tr>";
+
+	   });
+
+   }//some saved data found
+   $("#saved_pto_html").html("<div class='savedptodiv'><table width=100%>"+_html+"</table></div>");
+}
+
+function submitpto()
+{
+	var _empID=(EMPLOYEE_ID=="")?$("#empid").val():EMPLOYEE_ID;
+	var _emppassword=(EMPLOYEE_PASSWORD=="")?$("#emppassword").val():EMPLOYEE_PASSWORD;
+	if(_empID=="" || _emppassword==""){
+	  $("#pto_message").html(messageHTML(CLOCK_MESSAGE_ENTER_ID_AND_PASSWORD,true));
+	  return false;
+	}
+	var ptos=getLocalStorage('saved_pto');
+	if(ptos == null || ptos ==""){
+	  $("#pto_message").html(messageHTML(PTO_MESSAGE_SAVE_PTO_FIRST,true));
+	  return false;
+	}
+
+	var json_data={};
+	json_data["methodname"]="postPTO";
+	json_data["params"]=ptos;
+	json_data["comments"]=$("#comments").val();
+	myalert(JSON.stringify(json_data));
+
+	if(DEBUG_MODE){myalert(JSON_PATH);$("#debug").html(JSON.stringify(json_data));}
+	$.ajax({
+	  url: JSON_PATH,
+	  type: "POST",
+	  dataType: "json", /*type of data expected from server*/
+	  data: JSON.stringify(json_data),
+	  beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(CUSTOMER_CODE + ":" + CUSTOMER_KEY)); },
+	  success:pto_success,
+	  complete: pto_complete,
+	  contentType: "application/json; charset=\"utf-8\"",
+	  error: pto_error
+	});
+	return false;
+}
+function pto_error(xhr,textStatus,err){
+  if(DEBUG_MODE){
+    $("#debug").html(
+    $("#debug").html()+
+    ("readyState: " + xhr.readyState)+
+    ("responseText: "+ xhr.responseText)+
+    ("status: " + xhr.status)+
+    ("text status: " + textStatus)+
+    ("error: " + err)+
+    ("data: " +  $.http)
+    )
+    ;
+    }
+}
+
+function pto_success(result,status,xhr){
+ myalert(xhr.responseText);
+ //delete localstorage for saved PTOs
+ if(result["ERROR"]==0){
+   removeLocalStorageItem("saved_pto");
+   displaySavedPTO();
+   $("#comments").val("");
+ }
+ $("#pto_message").html(messageHTML(result["MESSAGE"],result["ERROR"]));
+}
+function pto_complete(XMLHTTPRequest, status)
+{
+ //post processing stuff
+}
+function afterLoad(){
+  /*add language specific label texts*/
+  //show emp name/site name etc
+  if(EMPLOYEE_ID != null && EMPLOYEE_ID !=""){
+    $("#tr_emp_login_id").hide();
+    $("#tr_emp_login_pass").hide();
+    $("#employee_name").html(HELLO +" "+EMPLOYEE_FIRST_NAME+" "+EMPLOYEE_LAST_NAME+"!");
+  }
+  //work codes if there is any
+  if(PTO_CODES !=null){
+	   var _option="";
+	   $.each( PTO_CODES, function( key, value ) {
+		 _option += "<option value='"+key + "'>" + value + "</option>";
+	   });
+	   var _html="<select class='selectdd input-sm input-lg' name='ptocode' id='ptocode'>"+_option+"</select></div>";
+	   $("#ptohtml").html(_html);
+  }
+  else
+  	   $("#ptohtml").html(NO_PTO_PAY_CODE_SETUP);
+
+   //date selectors
+   loadMonths();
+   loadMonthsDates($("#ptomonth").val());
+   loadYear();
+   //read savedpto from localstorage if employee id same load, otherwise clear localstorage
+   displaySavedPTO();
+
+  //myalert(window.localStorage.getItem('settings'));
+}
+function loadMonths(){
+   $.each( MONTHNAMES, function( key, value ) {
+     $("#ptomonth").append("<option value='"+((key+1)<10?"0":"")+(key+1) + "'>" + value + "</option>")
+   });
+}
+function loadMonthsDates(_month){
+   //date
+   _monthdays=getDaysInMonth(Number(_month));
+   for (var i = 1; i <= _monthdays; i++ ) {
+     $("#ptodate").append("<option value='"+(i<10?"0":"")+i + "'>" +(i<10?"0":"")+i + "</option>")
+   }
+}
+function loadYear(){
+   //add 2 years
+   var d = new Date();
+
+   $("#ptoyear").append("<option value='"+d.getFullYear() + "'>" +d.getFullYear()+ "</option>");
+   $("#ptoyear").append("<option value='"+(d.getFullYear()+1) + "'>" +(d.getFullYear()+1)+ "</option>");
+
+}
+
+</script>
